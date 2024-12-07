@@ -1,0 +1,30 @@
+﻿@model RegisterVM
+<form  asp-controller="account" asp-action="register" method="POST">
+    <div asp-validation-summary="All" class="error"></div>
+    <div class="form-group username">
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" />
+        <span asp-validation-for="UserName" class="error"></span>
+    </div>
+    <div class="form-group email">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email" class="error"></span>
+    </div>
+    <div class="form-group password">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" />
+        <span asp-validation-for="Password" class="error"></span>
+    </div>
+    <div class="form-group confirm-password">
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" />
+        <span asp-validation-for="ConfirmPassword" class="error"></span>
+    </div>
+    <div class="form-group submit">
+        <input type="submit" class="btn btn-primary" value="Sign-Up" />
+    </div>
+    <div class="text-center">
+        <p>Already have an account? <a asp-controller="account" asp-action="login">Sign In</a></p>
+    </div>
+</form>

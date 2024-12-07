@@ -1,0 +1,46 @@
+﻿@model PaginatedList<QuestionAnswerVM>
+@{
+    var filters = ViewData["Filters"] as QuestionFilterVM ?? new QuestionFilterVM();
+    var userId = ViewData["UserId"] as int?;
+    var parameters = new RouteValueDictionary
+    {
+        { "SearchKeyword", filters.SearchKeyword },
+        { "DateFrom", filters.DateFrom },
+        { "DateEnd", filters.DateEnd },
+        { "SortOrder",filters.SortOrder },
+        { "Id",userId}
+    };
+    if (filters.Tags?.Any() == true)
+    {
+        filters.Tags.Select((value, key) => new { value, key })
+                    .ToList()
+                    .ForEach((e) => parameters.Add($"Tag[{e.key}]", e.value));
+    }
+}
+<div class="container mt-4">
+    <partial name="~/Views/Question/_QuestionFilterForm.cshtml" model="filters" view-data='new ViewDataDictionary(ViewData) {{"ResetRouteUrl","feed"}}' />
+    @if (Model.Count > 0)
+    {
+        <div id="pages-items">
+
+            <partial name="~/Views/Question/_QuestionAnswerCards.cshtml" model="Model" />
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-4x text-muted mb-4"></i>
+            <h3 class="fw-bold text-muted">No Questions Answered By This User</h3>
+            <p class="text-muted">Stay tuned! Any questions answered by your followers will appear here.</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        const globalUrl="@Url.RouteUrl("profile/question-part", parameters)";
+    </script>
+    <script src="~/js/questions-fetching.js"></script>
+    <script src="~/js/answer-actions.js"></script>
+
+}

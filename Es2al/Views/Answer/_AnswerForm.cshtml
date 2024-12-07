@@ -1,0 +1,8 @@
+﻿@model NewAnswerVM
+<form asp-route="/inbox-answer" method="POST" id="answerForm_@ViewData["questionId"]" class="answer-form">
+    <div class="form-group mb-3">
+        <textarea asp-for="Text" class="form-control" rows="4" placeholder="Write your answer here..."></textarea>
+        <span asp-validation-for="Text" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Submit Answer</button>
+</form>

@@ -1,0 +1,130 @@
+﻿@inject INotificationService _notificationService;
+@{
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Es2al</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Es2al.styles.css" asp-append-version="true" />
+    <link rel="icon" href="@Url.Content("~/favicon.ico")" />
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-white">
+            <div class="container">
+
+                <p class="navbar-brand mb-0">
+                    <i class="fas fa-question-circle"></i><i class="fas fa-exclamation-circle"></i> Es2al
+                </p>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Feed" asp-action="Index">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Search" asp-action="index">
+                                <i class="fas fa-users"></i> Find People
+                            </a>
+                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Tag" asp-action="index">
+                                    <i class="fas fa-tags"></i> Add Tags
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item position-relative">
+                                <a class="nav-link" asp-route="notifications">
+                                    <i class="fas fa-bell"></i>
+                                    Notifications
+                                    @{
+                                        int unreadNotificationsCount = await _notificationService.NumberOfUnReadedNotificationsAsync(Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!));
+                                        if (unreadNotificationsCount > 0)
+                                        {
+                                            <span id="notifications-count" data-count="@unreadNotificationsCount" class="badge rounded-pill bg-danger position-absolute top-0 start-0 translate-middle">
+                                                @unreadNotificationsCount
+                                            </span>
+                                        }
+                                    }
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Inbox" asp-action="Index" asp-route-username="@User.Identity.Name">
+                                    <i class="fas fa-inbox"></i> Inbox
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)" asp-route="profile">
+                                    <i class="fas fa-user"></i> @User.Identity.Name
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-auth" asp-route="logout">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link btn-auth me-2" asp-route="register">
+                                    <i class="fas fa-user-plus"></i> Register
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-auth" asp-route="login">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+
+    <footer class="footer">
+        <div class="container text-center">
+            <span>&copy; 2024 Es2al</span>
+            <span class="mx-2">|</span>
+            <a href="https://github.com/ammar-gamal" target="_blank" class="text-dark mx-2 social-link">
+                <i class="fab fa-github fa-2x"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/ammar-gamal-870611237" target="_blank" class="text-dark mx-2 social-link">
+                <i class="fab fa-linkedin fa-2x"></i>
+            </a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

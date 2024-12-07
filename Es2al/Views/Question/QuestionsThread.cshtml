@@ -1,0 +1,71 @@
+﻿@model Dictionary<int, HashSet<QuestionAnswerVM>>
+@{
+    var FocusQuestionId = ViewData["FocusQuestionId"];
+}
+@functions {
+    private async Task RenderThreadAsync(Dictionary<int, HashSet<QuestionAnswerVM>> graph, QuestionAnswerVM root, string? parentQuestionText)
+    {
+        if (root.Question == null) return;
+
+
+        var collapseId = $"collapse_{root.Question.QuestionId}";
+        var headerText = parentQuestionText == null ? $"All Responds To {root.Question.Text}" : $"Responds To {parentQuestionText}";
+
+        <div class="accordion-item" id="question_@root.Question.QuestionId">
+            <h2 class="accordion-header" id="heading_@root.Question.QuestionId">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId" aria-expanded="true" aria-controls="@collapseId">
+                    <span>@headerText</span>
+                </button>
+            </h2>
+            <div id="@collapseId" class="accordion-collapse collapse show" aria-labelledby="heading_@root.Question.QuestionId">
+                <div class="accordion-body">
+                    @if (root.Answer == null)
+                    {
+                        <partial name="_Question" model="root.Question" view-data='new ViewDataDictionary(ViewData) { { "fromThread", true} ,{"url","/inbox-answer"} }' />
+                    }
+                    else
+                    {
+                        <partial name="_QuestionAnswer" model="root" view-data='new ViewDataDictionary(ViewData) { { "fromThread", true } }' />
+                    }
+
+                    @if (graph.TryGetValue(root.Question.QuestionId, out var neighbours))
+                    {
+                        foreach (var neighbour in neighbours)
+                        {
+                            await RenderThreadAsync(graph, neighbour, root.Question.Text);
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+<div class="accordion" id="accordionExample">
+    
+
+    @if (Model.TryGetValue(0, out var rootQuestions) && rootQuestions.Any())
+    {
+        await RenderThreadAsync(Model, rootQuestions.First(), null);
+    }
+    else
+    {
+        <div class="card text-center mt-4">
+            <div class="card-body">
+                <h1 class="card-title text-danger">No Questions Found</h1>
+                <p class="card-text">It seems there are no questions in this thread</p>
+            </div>
+        </div>
+
+    }
+</div>
+
+@section Scripts {
+    <script>
+        const focusQuestionId = "@FocusQuestionId";
+    </script>
+
+    
+    <script src="~/js/answer.js"></script>
+    <script src="~/js/thread.js"></script>
+    <script src="~/js/answer-actions.js"></script>
+}

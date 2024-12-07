@@ -1,0 +1,16 @@
+﻿@model IEnumerable<Tag>
+
+@{
+    ViewData["Title"] = "index";
+}
+
+<button onclick="$('#form-container').slideToggle()" class="btn btn-primary"> Create Tag</button>
+
+<div id="form-container" style="display:none">
+    <partial name="_TagForm" model="new Tag()" />
+</div>
+<div id="tags">
+</div>
+@section scripts {
+    <script src="~/js/tags.js"></script>
+}

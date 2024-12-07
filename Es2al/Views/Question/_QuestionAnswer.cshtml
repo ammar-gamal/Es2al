@@ -1,0 +1,154 @@
+﻿@model QuestionAnswerVM
+@{
+    ViewData["Title"] = "Question Details";
+    bool fromThread = ((bool?)ViewData["fromThread"]) ?? false;
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            @if (!fromThread && Model.Question.DisplayAllConversation)
+            {
+                <div class="d-flex justify-content-end mb-3">
+                    <a asp-action="QuestionsThread"
+                       asp-controller="Question"
+                       asp-route-questionId="@Model.Question.QuestionId"
+                       asp-route-ThreadId="@Model.Question.ThreadId"
+                       class="display-all-link btn btn-primary btn-sm">
+                        View Thread
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-1" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
+                        </svg>
+                    </a>
+                </div>
+            }
+            <div class="bg-dark text-light p-3 rounded mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="user-info d-flex align-items-center">
+                        @if (!Model.Question.IsAnonymous)
+                        {
+                            <a class="text-decoration-none text-primary fw-bold" asp-route="profile" asp-route-id="@Model.Question.SenderId"><strong>@Model.Question.SenderName</strong></a>
+                        }
+                        else
+                        {
+                            <h6 class="text-muted mb-0">Anonymous</h6>
+                        }
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted timestamp me-2">
+                            @Model.Question.GetDate()
+                        </small>
+                        @if (Model.DeletePermission)
+                        {
+                            <button class="btn btn-outline-danger btn-sm delete-question-btn"
+                                    onclick="deleteQuestion(this)"
+                                    data-question-id="@Model.Question.QuestionId"
+                                    title="Delete Question">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+                <div class="question-content my-3">
+                    <p class="mb-2">@Model.Question.Text</p>
+                    @if (Model.Question.Tags != null && Model.Question.Tags.Any())
+                    {
+                        <div class="tags">
+                            @foreach (var tag in Model.Question.Tags)
+                            {
+                                <span class="badge bg-secondary me-1">@tag</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Answer != null)
+            {
+                <div class="answer-section mt-4 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <img src="@(Model.Answer.Image != null ? $"data:image/*;base64,{Convert.ToBase64String(Model.Answer.Image)}" : "")"
+                                 alt="@Model.Answer.Username's Profile Picture"
+                                 class="rounded-circle me-2"
+                                 style="width: 40px; height: 40px; object-fit: cover;">
+                            <a class="text-decoration-none text-primary fw-bold" asp-route="profile" asp-route-id="@Model.Answer.UserId"><strong>@Model.Answer.Username</strong></a>
+                        </div>
+
+                        <small class="text-muted timestamp">
+                            @Model.Answer.GetDate()
+                        </small>
+                    </div>
+                    <div class="answer-content">
+                        <p>@Model.Answer.Text</p>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-3">
+                        <div class="reaction-container d-flex align-items-center gap-0">
+                            <button id="answer-@Model.Answer.AnswerId-like"
+                                    class="reaction-btn like-btn @(Model.Answer.IsReactedLike ? "active" : "")"
+                                    data-answer-id="@Model.Answer.AnswerId"
+                                    data-type="like"
+                                    data-count="@Model.Answer.NumberOfLikes"
+                                    onclick="toggleReact(this);">
+                                <i class="far fa-thumbs-up"></i>
+                                <span id="like-count-@Model.Answer.AnswerId" class="reaction-count">
+                                    @Model.Answer.NumberOfLikes
+                                </span>
+                            </button>
+                            <button id="answer-@Model.Answer.AnswerId-dislike"
+                                    class="reaction-btn dislike-btn @(Model.Answer.IsReactedDisLike ? "active" : "" )"
+                                    data-answer-id="@Model.Answer.AnswerId"
+                                    data-type="dislike"
+                                    data-count="@Model.Answer.NumberOfDislikes"
+                                    onclick="toggleReact(this);">
+                                <i class="far fa-thumbs-down"></i>
+                                <span id="dislike-count-@Model.Answer.AnswerId" class="reaction-count">
+                                    @Model.Answer.NumberOfDislikes
+                                </span>
+                            </button>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-comment comment-icon cursor-pointer me-2"
+                               onclick="subQuestion(this);"
+                               data-question-id="@Model.Question.QuestionId"
+                               data-thread-id="@Model.Question.ThreadId"
+                               data-receiver-id="@Model.Answer.UserId"
+                               title="Add a SubQuestion"></i>
+                        </div>
+                    </div>
+
+                    <div id="subQuestion_@Model.Question.QuestionId" style="display: none;">
+                        <partial name="~/Views/Question/_SubQuestion.cshtml"
+                                 model="new SubQuestionVM()" view-data='new ViewDataDictionary(ViewData){{"questionId",Model.Question.QuestionId}}' />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="no-answer text-muted mt-4">
+                    <p class="mb-0">No answer yet</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@* <div class="d-flex align-items-center">
+    <button id="answer-@(Model.Answer.AnswerId)-dislike"
+            class="btn btn-outline-danger me-2"
+            data-answer-id="@Model.Answer.AnswerId"
+            data-count="@Model.Answer.NumberOfDislikes"
+            onclick="toggleReact(this, '@React.Dislike')">
+        <i class="fas fa-thumbs-down"></i> Dislike
+    </button>
+    <span id="dislike-count-@(Model.Answer.AnswerId)" class="me-4">@Model.Answer.NumberOfDislikes</span>
+    <button id="answer-@(Model.Answer.AnswerId)-like"
+            class="btn btn-outline-success me-2"
+            data-answer-id="@Model.Answer.AnswerId"
+            data-count="@Model.Answer.NumberOfLikes"
+            onclick="toggleReact(this, '@React.Like')">
+        <i class="fas fa-thumbs-up"></i> Like
+    </button>
+    <span id="like-count-@(Model.Answer.AnswerId)">@Model.Answer.NumberOfLikes</span>
+</div> *@

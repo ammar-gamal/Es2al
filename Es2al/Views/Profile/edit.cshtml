@@ -1,0 +1,59 @@
+﻿@model EditUserVM
+@{
+    string imgSrc;
+    if (Model.Image is null)
+        imgSrc = "/images/default-profile.png";
+    else
+    {
+        string base64 = Convert.ToBase64String(Model.Image);
+        imgSrc = $"data:image/*;base64,{base64}";
+    }
+}
+<form class="form" asp-action="update" method="POST" enctype="multipart/form-data">
+    <div class="profile-picture-container">
+        <img id="profilePicture" src="@imgSrc" onclick="document.getElementById('fileInput').click();" style="cursor: pointer;">
+        <input type="file"
+               id="fileInput"
+               accept="image/*"
+               asp-for="Image"
+               class="form-control"
+               style="display: none;"
+               onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
+        <span asp-validation-for="Image" class="text-danger"></span>
+    </div>
+
+    <div asp-validation-summary="All" class="error"></div>
+
+    <div class="form-group username">
+        <label asp-for="UserName"></label>
+        <input readonly asp-for="UserName" class="readonly-input" />
+    </div>
+
+    <div class="form-group email">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email" class="error"></span>
+    </div>
+
+    <div class="form-group bio">
+        <label asp-for="Bio">Bio</label>
+        <textarea asp-for="Bio" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Bio" class="error"></span>
+    </div>
+
+
+
+    <div class="questionTags">
+        <label>Select Tags:</label>
+        @foreach (var tag in ViewBag.AllTags)
+        {
+            <div class="tag">
+                <input id="@tag.Id" type="checkbox" name="Tags" @(Model.Tags?.Contains(tag.Id) ?? false ? "checked" : "") value="@tag.Id" />
+                <label for="@tag.Id">@tag.Name</label>
+            </div>
+        }
+    </div>
+    <div class="form-group submit">
+        <input type="submit" class="btn btn-primary" value="Edit" />
+    </div>
+</form>

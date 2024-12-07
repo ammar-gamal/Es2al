@@ -1,0 +1,97 @@
+﻿@model UserProfileVM
+@{
+
+
+    bool isFollowing = ViewBag.IsFollowing;
+    string imgSrc = Model.Image != null
+                    ? $"data:image/*;base64,{Convert.ToBase64String(Model.Image)}"
+                    : Url.Content("~/images/Default_pfp.jpg");
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg mx-auto" style="max-width: 600px;">
+        <div class="card-header bg-primary text-white text-center">
+            <h2 class="mb-0">@Model.UserName's Profile</h2>
+        </div>
+        <div class="card-body text-center">
+            <div class="profile-picture-container mb-3">
+                <img id="profilePicture" data-user-id="@Model.Id" class="rounded-circle img-fluid border border-3 border-primary"
+                     style="width: 150px; height: 150px; object-fit: cover;"
+                     src="@imgSrc" alt="@Model.UserName's profile picture" />
+            </div>
+            <h3 class="text-primary mb-0">@Model.UserName</h3>
+            <p class="text-muted mb-2">@Model.Email</p>
+            <p class="text-secondary">@Model.Bio</p>
+            <div class="d-flex justify-content-center my-3">
+                <div class="modal fade" id="listModel" tabindex="-1" role="dialog" aria-labelledby="listModelLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modelTitle"></h5>
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div id="list-model-content" class="modal-body">
+                                <ul id="user-list" class="list-group mb-4"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="displayList(this)" data-type="Followers" class="btn btn-outline-primary mx-2">
+                    <strong>Followers:</strong> <span id="followersNumber" class="badge bg-primary" data-followers-count=@Model.FollowerAndFollowingVM.FollowersCount>@Model.FollowerAndFollowingVM.FollowersCount</span>
+                </button>
+                <button onclick="displayList(this)" data-type="Followings" class="btn btn-outline-primary mx-2">
+                    <strong>Followings:</strong> <span id="followingsNumber" class="badge bg-primary">@Model.FollowerAndFollowingVM.FollowingsCounts</span>
+                </button>
+                <a asp-route="profile/questions" asp-route-id="@Model.Id" class="btn btn-outline-primary mx-2">
+                    <strong>Answers:</strong> <span class="badge bg-primary">@Model.AnsweredQuestionsCount</span>
+                </a>
+     
+            </div>
+
+            @if (Model.Tags != null)
+            {
+                <div class="d-flex flex-wrap justify-content-center mt-3">
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <span class="badge bg-primary me-1 mb-1">@tag</span>
+                    }
+                </div>
+            }
+
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                if (Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!) == Model.Id)
+                {
+                    <a asp-route="profile/edit" class="btn btn-outline-primary mt-3">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                }
+                else
+                {
+                    <button id="followButton" data-is-following=@(isFollowing ? 1 : 0) class="btn @(isFollowing ? "btn-secondary" : "btn-danger") mt-3"
+                            onclick="toggleFollow()">
+                        @(isFollowing ? "UnFollow" : "Follow")
+                    </button>
+                }
+            }
+        </div>
+        <div class="card-footer d-flex flex-column align-items-center">
+            <button class="btn btn-primary mb-3" onclick="display()">
+                Ask Me Now!
+            </button>
+            <div id="question" class="w-100" style="display: none;">
+                <partial name="~/Views/Question/_QuestionForm.cshtml" model="@new NewQuestionVM()" />
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/profile.js"></script>
+    <script src="~/js/questionForm.js"></script>
+}
+

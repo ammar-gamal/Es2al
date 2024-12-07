@@ -1,0 +1,33 @@
+﻿@model NewQuestionVM
+@{
+    var tags = ViewData["AllTags"] as List<Tag>;
+}
+
+<form id="questionForm" method="POST" asp-route="ask">
+    <span asp-validation-for="Text" class="error"></span>
+    <textarea asp-for="Text" type="text" rows="10" placeholder="Write Your Question Here :)"></textarea>
+
+    <div class="form-group anonymous-slider">
+        <label class="form-group-label" asp-for="IsAnonymous">Anonymous Question</label>
+        <label class="switch">
+            <input asp-for="IsAnonymous" type="checkbox" />
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <span asp-validation-for="Tags" class="error"></span>
+    <div class="questionTags">
+        @foreach (var tag in tags)
+        {
+            <div class="tag">
+                <label>
+                    <input type="checkbox" name="Tags" @(Model.Tags?.Contains(tag.Id) ?? false ? "checked" : "") value="@tag.Id" />
+                    @tag.Name
+                </label>
+            </div>
+
+        }
+    </div>
+
+    <input type="submit" class="btn btn-primary" value="Send" />
+</form>

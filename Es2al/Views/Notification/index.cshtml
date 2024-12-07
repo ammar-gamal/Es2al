@@ -1,0 +1,62 @@
+﻿@model Dictionary<bool,List<Notification>>
+@if (Model.Count == 0)
+{
+    <div class="container mt-4 text-center">
+        <h5 class="text-muted">You have no notifications at the moment.</h5>
+        <p class="text-secondary">Check back later to see if there’s anything new.</p>
+    </div>
+}
+else
+{
+    <div class="container mt-4 notification-wrapper">
+        @foreach (var keyValue in Model)
+        {
+            <div class="mb-5 ">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="text-@((keyValue.Key ? "success" : "primary"))">
+                        @(keyValue.Key ? "Readed Notifications" : "Unreaded Notifications")
+                    </h5>
+                    @if (keyValue.Key)
+                    {
+                        <a asp-route="delete-all-readed"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Are you sure you want to delete all read notifications?');">
+                            Delete All
+                        </a>
+                    }
+                </div>
+                <div id="notifications-container">
+                    <ul id="@(keyValue.Key ? "readed-notifications" : "unreaded-notifications")"
+                        class="list-group shadow-sm">
+                        @foreach (var notification in keyValue.Value)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start"
+                                id="@notification.Id">
+                                <div>
+                                    <p class="small text-muted mb-1">
+                                        @notification.Date.ToString("MMM dd, yyyy HH:mm")
+                                    </p>
+                                    <p class="mb-1">@notification.Text</p>
+                                    @if (notification.RelatedUrl != null)
+                                    {
+                                        <a href="@notification.RelatedUrl" class="text-info">
+                                            @notification.AnchorText
+                                        </a>
+                                    }
+                                </div>
+                                @if (!keyValue.Key)
+                                {
+                                    <button class="btn btn-outline-primary btn-sm" onclick="markAsRead(@notification.Id)">Mark as Read</button>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/notification.js"></script>
+}

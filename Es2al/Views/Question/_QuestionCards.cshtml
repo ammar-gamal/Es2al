@@ -1,0 +1,10 @@
+﻿@model PaginatedList<QuestionVM>
+
+<div class="page-items" data-page="@Model.PageIndex" data-total-pages="@Model.TotalPages">
+    @foreach (var question in Model)
+    {
+        <div id="question_@question.QuestionId">
+            <partial name="~/Views/Question/_Question.cshtml" model="question" />
+        </div>
+    }
+</div>

@@ -1,0 +1,14 @@
+﻿<form method="get" asp-route="users-search" id="user-search" class="mb-3 p-2 d-flex justify-content-center position-relative">
+    <div class="input-group w-100">
+        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+        <input name="username" placeholder="Search by username" class="form-control border-start-0" />
+        <button type="submit" class="btn btn-primary ms-2">Search</button>
+    </div>
+</form>
+<div id="pages-items" class="container">
+ 
+</div>
+
+@section Scripts {
+    <script src="~/js/search.js"></script>
+}

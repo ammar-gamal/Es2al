@@ -1,0 +1,71 @@
+﻿@model QuestionVM
+@{
+    bool fromThread = ((bool?)ViewData["fromThread"]) ?? false;
+}
+
+<div class="card mb-3 question-card">
+    <div class="card-body">
+        @if (!fromThread && Model.ParentQuestionAnswer != null)
+        {
+            <div id="question_@Model.ParentQuestionAnswer.Question.QuestionId" class="parent-question">
+                <partial name="~/Views/Question/_QuestionAnswer.cshtml" model="Model.ParentQuestionAnswer" />
+            </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="user-info">
+                @if (!Model.IsAnonymous)
+                {
+                    <h5 class="card-title mb-0">
+                        <a asp-route="profile" asp-route-id="@Model.SenderId" class="text-primary text-decoration-none user-link">
+                            @Model.SenderName
+                        </a>
+                    </h5>
+                }
+                else
+                {
+                    <h5 class="card-subtitle text-muted mb-0">Anonymous</h5>
+                }
+            </div>
+            <div class="d-flex align-items-center">
+                <small class="text-muted timestamp me-2">
+                    @Model.GetDate()
+                </small>
+           
+                    <button class="btn btn-outline-danger btn-sm delete-question-btn"
+                            onclick="deleteQuestion(this)"
+                            data-question-id="@Model.QuestionId"
+                            title="Delete Question">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+            </div>
+        </div>
+
+        <div class="card-text mb-3">
+            <p class="mb-2">@Model.Text</p>
+
+            @if (Model.Tags?.Any() == true)
+            {
+                <div class="tags">
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <span class="badge bg-secondary me-1">@tag</span>
+                    }
+                </div>
+            }
+
+        </div>
+
+        <button class="btn btn-primary btn-sm answer-btn"
+                onclick="answer(this)"
+                data-question-id="@Model.QuestionId">
+            Answer
+        </button>
+
+        <div class="answer mt-3" id="answer_@Model.QuestionId" style="display: none;">
+            <partial name="~/Views/Answer/_AnswerForm.cshtml"
+                     model="new NewAnswerVM()"
+                     view-data='new ViewDataDictionary(ViewData){{"questionId",Model.QuestionId}}' />
+        </div>
+    </div>
+</div>

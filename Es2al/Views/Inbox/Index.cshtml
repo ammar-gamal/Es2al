@@ -1,0 +1,45 @@
+﻿@model PaginatedList<QuestionVM>
+@{
+    var filters = ViewData["Filters"] as QuestionFilterVM ?? new QuestionFilterVM();
+    var parameters = new RouteValueDictionary
+    {
+        { "SearchKeyword", filters.SearchKeyword },
+        { "DateFrom", filters.DateFrom },
+        { "DateEnd", filters.DateEnd },
+        { "SortOrder",filters.SortOrder }
+    };
+    if (filters.Tags?.Any() == true)
+    {
+        filters.Tags.Select((tag, index) => new { key = $"Tag[{index}]", value = tag })
+                    .ToList()
+                    .ForEach(keyValue => parameters.Add(keyValue.key, keyValue.value));
+    }
+}
+<div class="container mt-4">
+   
+    @if (Model.Count > 0)
+    {
+        <partial name="~/Views/Question/_QuestionFilterForm.cshtml" model="filters" view-data='new ViewDataDictionary(ViewData) {{"ResetRouteUrl","inbox"}}' />
+        <div id="pages-items" >
+            <partial name="~/Views/Question/_QuestionCards.cshtml" model="Model"  />
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-4x text-muted mb-4"></i>
+            <h3 class="fw-bold text-muted">Your Inbox Is Empty</h3>
+            <p class="text-muted">No questions have been received yet.</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        const globalUrl = "@Url.RouteUrl("inbox/question-part", parameters)";
+    </script>
+    <script src="~/js/questions-fetching.js"></script>
+    <script src="~/js/answer-actions.js"></script>
+    <script src="~/js/answer.js"></script>
+
+}

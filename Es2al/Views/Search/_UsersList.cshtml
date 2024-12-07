@@ -1,0 +1,7 @@
+﻿@model PaginatedList<DisplayUserVM>
+<ul class="page-items list-group" data-page="@Model.PageIndex" data-total-pages="@Model.TotalPages" >
+    @foreach (var user in Model)
+    {
+        <partial name="~/Views/Search/_User.cshtml" model="user" />
+    }
+</ul>
