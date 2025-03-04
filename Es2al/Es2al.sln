@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Es2al.DataAccess", "..\Es2a
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Es2al.Services", "..\Es2al.Services\Es2al.Services.csproj", "{B3FF328A-48B9-4F65-9958-8550AA9EDA1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Es2al.Tests", "..\Es2al.Tests\Es2al.Tests.csproj", "{DFEE7205-0274-475F-B27A-114D1300F2CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{B3FF328A-48B9-4F65-9958-8550AA9EDA1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3FF328A-48B9-4F65-9958-8550AA9EDA1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3FF328A-48B9-4F65-9958-8550AA9EDA1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFEE7205-0274-475F-B27A-114D1300F2CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFEE7205-0274-475F-B27A-114D1300F2CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFEE7205-0274-475F-B27A-114D1300F2CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFEE7205-0274-475F-B27A-114D1300F2CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

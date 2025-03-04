@@ -68,7 +68,7 @@
                 <div class="answer-section mt-4 pt-3 border-top">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center">
-                            <img src="@(Model.Answer.Image != null ? $"data:image/*;base64,{Convert.ToBase64String(Model.Answer.Image)}" : "")"
+                            <img src="@(Model.Answer.Image != null ? $"data:image/*;base64,{Convert.ToBase64String(Model.Answer.Image)}" : Url.Content("~/images/Default_pfp.jpg"))"
                                  alt="@Model.Answer.Username's Profile Picture"
                                  class="rounded-circle me-2"
                                  style="width: 40px; height: 40px; object-fit: cover;">
