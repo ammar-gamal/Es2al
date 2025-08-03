@@ -7,7 +7,10 @@
     <li>Frontend: HTML, CSS, Bootstrap, and JavaScript</li>
     <li>Database: SQL Server</li>
 </ul>
-
+<h2>Testing</h2>
+<p>
+    The project includes unit tests to ensure core logic correctness and support future maintainability. Tests are written using <code>xUnit</code>, <code>Moq</code>, and <code>FluentAssertions</code>.
+</p>
 <h2>Features</h2>
 <ul>
     <li>User registration and authentication.</li>
