@@ -1,13 +1,9 @@
 ﻿@model EditUserVM
 @{
-    string imgSrc;
-    if (Model.Image is null)
-        imgSrc = "/images/default-profile.png";
-    else
-    {
-        string base64 = Convert.ToBase64String(Model.Image);
-        imgSrc = $"data:image/*;base64,{base64}";
-    }
+
+    string imgSrc = Model.Image != null
+                 ? $"data:image/*;base64,{Convert.ToBase64String(Model.Image)}"
+                 : Url.Content("~/images/Default_pfp.jpg");
 }
 <form class="form" asp-action="update" method="POST" enctype="multipart/form-data">
     <div class="profile-picture-container">

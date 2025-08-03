@@ -10,7 +10,8 @@ namespace Es2al.DataAccess.Repositories
         public QuestionRepository(AppDbContext context) : base(context) { }
         public async Task <Question>GetQuestionAsync(int questionId, int receiverId)
         {
-            return  await _dbSet.FirstAsync(e => e.Id == questionId && e.ReceiverId == receiverId);
+            var question = await _dbSet.FirstOrDefaultAsync(e => e.Id == questionId && e.ReceiverId == receiverId);
+            return question ?? throw new KeyNotFoundException($"Question with Id {questionId} and ReceiverId {receiverId} not found.");
         }
         public async Task RemoveAsync(int questionId, int receiverId)
         {

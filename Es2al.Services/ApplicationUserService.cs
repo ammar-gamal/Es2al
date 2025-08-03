@@ -97,7 +97,7 @@ namespace Es2al.Services
                                       UserName = e.UserName!,
                                       Image = e.Image!
                                   });
-            return await PaginatedList<DisplayUserVM>.CreateAsync(matchedUsers, pageIndex, Utilites.ItemsPerPage);
+            return await PaginatedList<DisplayUserVM>.CreateAsync(matchedUsers, pageIndex, Constants.ItemsPerPage);
         }
         
         public async Task<string?>GetUserNameAsync(int Id)

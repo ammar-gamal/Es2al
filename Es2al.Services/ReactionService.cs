@@ -32,7 +32,7 @@ namespace Es2al.Services
                     });
                     return 1;
                 }
-                else if (userReact.React == react)//was dislike and clicked again 
+                else if (userReact.React == react)//was reacted a react and clicked same react again 
                 {
                     await _reactionRepository.RemoveAsync(userReact);
                     return -1;

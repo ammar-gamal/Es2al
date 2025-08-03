@@ -5,10 +5,10 @@ using Es2al.Services.CustomException;
 using Es2al.Services.IServices;
 using Es2al.Services.Paging;
 using Microsoft.EntityFrameworkCore;
-using static Es2al.Services.Utilites;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using Es2al.Services.CustomEventArgs;
+using Es2al.Services.Events.CustomEventArgs;
+using static Es2al.Services.Events.AsyncEventHandlers;
 
 namespace Es2al.Services
 {
@@ -86,7 +86,7 @@ namespace Es2al.Services
             var list = _userFollowRepository.GetUserFollowers(userId)
                                             .Select(e => new DisplayUserVM { Id = e.FollowerId, Image = e.Follower.Image, UserName = e.Follower.UserName })
                                             .OrderBy(e => e.Id);
-            return await PaginatedList<DisplayUserVM>.CreateAsync(list, pageIndex, Utilites.ItemsPerPage);
+            return await PaginatedList<DisplayUserVM>.CreateAsync(list, pageIndex, Constants.ItemsPerPage);
         }
 
         public async Task<PaginatedList<DisplayUserVM>> GetUserFollowingsAsync(int userId, int pageIndex)
@@ -94,7 +94,7 @@ namespace Es2al.Services
             var list = _userFollowRepository.GetUserFolloweings(userId)
                                             .Select(e => new DisplayUserVM { Id = e.FollowingId, Image = e.Following.Image, UserName = e.Following.UserName })
                                             .OrderBy(e=>e.Id);
-            return await PaginatedList<DisplayUserVM>.CreateAsync(list, pageIndex, Utilites.ItemsPerPage);
+            return await PaginatedList<DisplayUserVM>.CreateAsync(list, pageIndex, Constants.ItemsPerPage);
         }
 
 

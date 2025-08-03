@@ -1,5 +1,4 @@
 ﻿using Es2al.Models.Entites;
-using Es2al.Services.CustomEventArgs;
 
 namespace Es2al.Services.IServices
 {

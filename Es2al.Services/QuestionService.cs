@@ -4,6 +4,10 @@ using Es2al.Services.ViewModels;
 using Es2al.Services.IServices;
 using Es2al.Services.Paging;
 using Microsoft.EntityFrameworkCore;
+using Es2al.Services.ExtensionMethods;
+using System.Linq.Expressions;
+using Es2al.Models.Enums;
+
 
 
 namespace Es2al.Services
@@ -19,6 +23,8 @@ namespace Es2al.Services
         }
         public async Task CreateQuestionAsync(Question question)
         {
+            ArgumentNullException.ThrowIfNull(question);
+
             if (question.ThreadId == 0) //this question is new one and make new thread and add this question to this thread
                 await _questionThreadsService.AddQuestionToNewThreadAsync(question);
             else
@@ -28,6 +34,7 @@ namespace Es2al.Services
         public async Task DeleteQuestionAsync(int questionId, int currentUserId)
         {
             var targetQuestion = await _questionRepository.GetQuestionAsync(questionId, currentUserId);
+      
             if (targetQuestion.IsAnswered == false)//not answered questin => just delete it 
                 await _questionRepository.RemoveAsync(targetQuestion);
             else
@@ -37,7 +44,7 @@ namespace Es2al.Services
                                                          .GroupBy(e => e.ParentQuestionId ?? 0)
                                                          .ToDictionaryAsync(e => e.Key, e => e.ToHashSet());
 
-                Utilites.MarkChildrenAsDeleted(questions, deletedQuestions, questionId);
+                MarkChildrenAsDeleted(questions, deletedQuestions, questionId);
                 await _questionRepository.RemoveRangeAsync(deletedQuestions);
             }
             if (targetQuestion.ParentQuestionId == null)//delete the thread
@@ -51,8 +58,8 @@ namespace Es2al.Services
         public async Task<QuestionAnswerVM?> GetQuestionAnswerAsync(int questionId, int currentUserId)
         {
             return await _questionRepository.GetAll()
-                                            .Where(e => e.Id == questionId)
-                                            .Select(Utilites.QuestionAnswerVMProjection(currentUserId))
+                                            .Where(e => e.Id == questionId && e.IsAnswered==true)
+                                            .Select(CreateQuestionAnswerVMProjection(currentUserId))
                                             .FirstOrDefaultAsync();
         }
         public async Task<Question> GetQuestionAsync(int questionId, int receiverId)
@@ -65,41 +72,133 @@ namespace Es2al.Services
             if (await query.CountAsync() == 0)
                 return null;
 
-                var receiverId = await query.Select(e => e.ReceiverId)
+            var receiverId = await query.Select(e => e.ReceiverId)
                                             .FirstOrDefaultAsync();
             if (receiverId != userId) //not the receiver so you should just get all answered questions only
                 query = query.Where(q => q.IsAnswered == true).OrderByDescending(q => q.Date);
             else
                 query = query.OrderBy(e => e.IsAnswered).ThenByDescending(q => q.Date);
 
-            var questions = await query.GroupBy(e => e.ParentQuestionId ?? 0, Utilites.QuestionAnswerVMProjection(userId))
-                                  .ToDictionaryAsync(e => e.Key, e => e.ToHashSet());
+            var questions = await query.GroupBy(e => e.ParentQuestionId ?? 0, CreateQuestionAnswerVMProjection(userId))
+                                       .ToDictionaryAsync(e => e.Key, e => e.ToHashSet());
 
             return questions;
         }
-        public async Task<PaginatedList<QuestionAnswerVM>> GetFeedQAsAsync(int userId, int pageIdx, QuestionFilterVM questionFilterVM)
+        public async Task<PaginatedList<QuestionAnswerVM>> GetFeedQAsAsync(int userId, int pageIdx, QuestionFilterVM? questionFilterVM)
         {
-            var feedQA = Utilites.FilterQuestions(_questionRepository.GetFeedQAs(userId), questionFilterVM)
-                                 .AsSplitQuery()
-                                 .Select(Utilites.QuestionAnswerVMProjection(userId));
+            var feedQA = _questionRepository.GetFeedQAs(userId)
+                        .ApplyFilters(questionFilterVM)
+                        .AsSplitQuery()
+                        .Select(CreateQuestionAnswerVMProjection(userId));
 
-            return await PaginatedList<QuestionAnswerVM>.CreateAsync(feedQA, pageIdx, Utilites.ItemsPerPage);
+            return await PaginatedList<QuestionAnswerVM>.CreateAsync(feedQA, pageIdx, Constants.ItemsPerPage);
         }
-        public async Task<PaginatedList<QuestionVM>> GetUserInboxAsync(int userId, int pageIndex, QuestionFilterVM questionFilterVM)
+        public async Task<PaginatedList<QuestionVM>> GetUserInboxAsync(int userId, int pageIndex, QuestionFilterVM? questionFilterVM)
         {
-            var inboxQuestions = Utilites.FilterQuestions(_questionRepository.GetUserInbox(userId), questionFilterVM)
-                                         .AsSplitQuery()
-                                         .Select(Utilites.InboxQuestionVMProjection(userId));
+            var inboxQuestions = _questionRepository.GetUserInbox(userId)
+                                  .ApplyFilters(questionFilterVM)
+                                  .AsSplitQuery()
+                                  .Select(CreateInboxQuestionVMProjection(userId));
 
-            return await PaginatedList<QuestionVM>.CreateAsync(inboxQuestions, pageIndex, Utilites.ItemsPerPage);
+            return await PaginatedList<QuestionVM>.CreateAsync(inboxQuestions, pageIndex, Constants.ItemsPerPage);
         }
-        public async Task<PaginatedList<QuestionAnswerVM>> GetUserQA(int visiterId, int userId, int pageIndex, QuestionFilterVM questionFilterVM)
+        public async Task<PaginatedList<QuestionAnswerVM>> GetUserQA(int visiterId, int userId, int pageIndex, QuestionFilterVM? questionFilterVM)
         {
-            var userQA = Utilites.FilterQuestions(_questionRepository.GetUserQAs(userId), questionFilterVM)
-                                 .Select(Utilites.QuestionAnswerVMProjection(visiterId));//visiterId to check if this visiter react to any quesstions or not 
+            var userQA = _questionRepository.GetUserQAs(userId)
+                          .ApplyFilters(questionFilterVM)
+                          .Select(CreateQuestionAnswerVMProjection(visiterId));                         
 
-            return await PaginatedList<QuestionAnswerVM>.CreateAsync(userQA, pageIndex, Utilites.ItemsPerPage);
+                        //visiterId to check if this visiter react to any quesstions or not 
+
+            return await PaginatedList<QuestionAnswerVM>.CreateAsync(userQA, pageIndex, Constants.ItemsPerPage);
         }
+
+
+       private void MarkChildrenAsDeleted(Dictionary<int, HashSet<Question>> graph, List<Question> deletedQuestions, int questionId)
+        {
+            if (!graph.TryGetValue(questionId, out HashSet<Question>? neighbours))
+            {//what is our base-case ? it is a leaf node (leaf node not has any childrens)
+                return;
+            }
+            foreach (var question in neighbours)
+            {
+                deletedQuestions.Add(question);
+                MarkChildrenAsDeleted(graph, deletedQuestions, question.Id);
+            }
+        }
+       public static Expression<Func<Question, QuestionAnswerVM>> CreateQuestionAnswerVMProjection(int currentUserId) => question => new QuestionAnswerVM
+        {
+            Question = new QuestionVM
+            {
+                QuestionId = question.Id,
+                ThreadId = question.ThreadId,
+                Text = question.Text,
+                Tags = question.Tags.Select(t => t.Tag.Name).ToList(),
+                Date = question.Date,
+                SenderName = question.IsAnonymous ? "Anonymous" : question.Sender.UserName!,
+                SenderId = question.IsAnonymous ? 0 : question.SenderId,
+                IsAnonymous = question.IsAnonymous,
+                DisplayAllConversation = question.Thread.Questions.Where(e => e.IsAnswered == true).Count() >= 2,
+                ParentQuestionAnswer = !(question.ParentQuestionId.HasValue) ? null : new QuestionAnswerVM { Question = new QuestionVM { QuestionId = question.ParentQuestionId.Value } },//we meed the parent id => DFS
+            },
+            Answer = question.Answer == null ? null
+           : new AnswerVM
+           {
+               AnswerId = question.Answer.Id,
+               Date = question.Answer.Date,
+               UserId = question.Answer.UserId,
+               Username = question.Answer.User.UserName!,
+               Text = question.Answer.Text,
+               Image = question.Answer.User.Image,
+               NumberOfDislikes = question.Answer.Reactions.Count(e => e.React == React.Dislike),
+               NumberOfLikes = question.Answer.Reactions.Count(e => e.React == React.Like),
+               ReactionByCurrentUser = question.Answer.Reactions.Where(e => e.UserId == currentUserId)
+                                                         .Select(e => (React?)e.React)
+                                                         .FirstOrDefault()
+           },
+            DeletePermission = question.ReceiverId == currentUserId
+        };
+       public static Expression<Func<Question, QuestionVM>> CreateInboxQuestionVMProjection(int currentUserId) => question => new QuestionVM
+        {
+            QuestionId = question.Id,
+            Text = question.Text,
+            Tags = question.Tags.Select(t => t.Tag.Name).ToList(),
+            Date = question.Date,
+            SenderName = question.IsAnonymous ? "Anonymous" : question.Sender.UserName ?? "Unknown",
+            SenderId = question.IsAnonymous ? 0 : question.SenderId,
+            IsAnonymous = question.IsAnonymous,
+            ThreadId = question.ThreadId,
+            ParentQuestionAnswer = question.ParentQuestionId.HasValue ? new QuestionAnswerVM
+            {
+                Question = new QuestionVM
+                {
+                    QuestionId = question.ParentQuestion!.Id,
+                    ThreadId = question.ParentQuestion.ThreadId,
+                    Text = question.ParentQuestion.Text,
+                    Tags = question.ParentQuestion.Tags.Select(t => t.Tag.Name).ToList(),
+                    Date = question.ParentQuestion.Date,
+                    SenderName = question.ParentQuestion.IsAnonymous ? "Anonymous" : question.ParentQuestion.Sender.UserName!,
+                    SenderId = question.ParentQuestion.IsAnonymous ? 0 : question.ParentQuestion!.SenderId,
+                    IsAnonymous = question.ParentQuestion.IsAnonymous,
+                    DisplayAllConversation = true
+                },
+                Answer = new AnswerVM
+                {
+                    AnswerId = question.ParentQuestion.Answer.Id,
+                    Date = question.ParentQuestion.Answer.Date,
+                    UserId = question.ParentQuestion.Answer.UserId,
+                    Username = question.ParentQuestion.Answer.User.UserName!,
+                    Text = question.ParentQuestion.Answer.Text,
+                    Image = question.ParentQuestion.Answer.User.Image,
+                    NumberOfDislikes = question.ParentQuestion.Answer.Reactions.Count(e => e.React == React.Dislike),
+                    NumberOfLikes = question.ParentQuestion.Answer.Reactions.Count(e => e.React == React.Like),
+                    ReactionByCurrentUser = question.ParentQuestion.Answer.Reactions.Where(e => e.UserId == currentUserId)
+                                                     .Select(e => (React?)e.React)
+                                                     .FirstOrDefault()
+                }
+            } : null
+        };
+
 
     }
 }

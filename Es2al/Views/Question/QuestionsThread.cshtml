@@ -9,7 +9,7 @@
 
 
         var collapseId = $"collapse_{root.Question.QuestionId}";
-        var headerText = parentQuestionText == null ? $"All Responds To {root.Question.Text}" : $"Responds To {parentQuestionText}";
+        var headerText = parentQuestionText == null ? $"All Responses To {root.Question.Text}" : $"Response To {parentQuestionText}";
 
         <div class="accordion-item" id="question_@root.Question.QuestionId">
             <h2 class="accordion-header" id="heading_@root.Question.QuestionId">

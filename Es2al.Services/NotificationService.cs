@@ -1,6 +1,6 @@
 ﻿using Es2al.DataAccess.Repositories.IRepositroies;
 using Es2al.Models.Entites;
-using Es2al.Services.CustomEventArgs;
+using Es2al.Services.Events.CustomEventArgs;
 using Es2al.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +60,7 @@ namespace Es2al.Services
             string ReceiverName = (await _applicationUserService.GetUserNameAsync(eventArgs.ReceiverId))!;
             Notification notification = new Notification
             {
-                Date = DateTime.UtcNow,
+                Date = DateTime.Now,
                 Text = $"{ReceiverName} Is Answered Your Question.",
                 AnchorText = "Click To See Answer",
                 UserId = eventArgs.UserId,

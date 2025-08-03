@@ -48,7 +48,6 @@ namespace Es2al
             builder.Services.AddScoped<IUserFollowRepository,UserFollowRepository>();
             builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
             builder.Services.AddScoped<IQuestionTagRepository, QuestionTagRepository>();
-
             builder.Services.AddScoped<ITagService, TagService>();
             builder.Services.AddScoped<IFollowingService, FollowingService>();
             builder.Services.AddScoped<IQuestionService, QuestionService>();

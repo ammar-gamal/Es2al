@@ -9,5 +9,8 @@ namespace Es2al.Models.Entites
         public string? RelatedUrl { get; set; }
         public string? AnchorText { get; set; }
         public bool IsMarkedAsReed { get; set; }
+      
+
+
     }
 }
