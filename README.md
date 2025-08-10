@@ -6,7 +6,10 @@
     It uses a thread-based design where each new question automatically creates its own thread, keeping all related subquestions and answers organized in a clear hierarchy.
     It also includes advanced filtering, an infinite scroll browsing experience, a tag management system with admin control, and user engagement features.
 </p>
-
+<h2>Demo</h2>
+<p>
+    <a href="https://drive.google.com/file/d/1YGr87Nc2NFVPCv3-Rrl8ylNr0C4q2xMR/view?usp=sharing" target="_blank">Watch the Demo Video</a>
+</p>
 <h2>Technologies Used</h2>
 <ul>
     <li><b>Backend:</b> C#, ASP.NET MVC Framework, Entity Framework Core</li>
@@ -52,10 +55,32 @@
     </li>
 </ul>
 
-<h2>Demo</h2>
-<p>
-    <a href="https://drive.google.com/file/d/1YGr87Nc2NFVPCv3-Rrl8ylNr0C4q2xMR/view?usp=sharing" target="_blank">Watch the Demo Video</a>
-</p>
+
+<h2>Getting Started with Docker</h2>
+<p>You can quickly run the Es2al application using Docker.</p>
+
+<h3>Prerequisites</h3>
+<ul>
+    <li><a href="https://docs.docker.com/get-docker/" target="_blank">Docker</a> installed</li>
+    <li><a href="https://docs.docker.com/compose/install/" target="_blank">Docker Compose</a> installed</li>
+</ul>
+
+<h3>Steps to Run</h3>
+<ol>
+    <li><b>Clone the repository</b>
+        <pre><code>https://github.com/ammar-gamal/Es2al.git
+cd Es2al</code></pre>
+    </li>
+    <li><b>Build and start the containers</b>
+        <pre><code>docker-compose up --build</code></pre>
+    </li>
+    <li><b>Access the application</b>
+        <p>Open your browser and go to: <code>http://localhost:5000</code></p>
+    </li>
+    <li><b>Stopping the application</b>
+        <pre><code>docker-compose down</code></pre>
+    </li>
+</ol>
 
 <h2>ERD & Schema</h2>
 <div style="align:center;">
