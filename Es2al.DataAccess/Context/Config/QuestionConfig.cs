@@ -17,7 +17,7 @@ namespace Es2al.DataAccess.Context.Config
                    .WithOne(e => e.ParentQuestion)
                    .HasForeignKey(e => e.ParentQuestionId)
                    .IsRequired(false)
-                   .OnDelete(DeleteBehavior.SetNull);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(e => e.Sender)
                    .WithMany(e => e.SendedQuestions)
