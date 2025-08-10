@@ -17,29 +17,37 @@
 
 <h2>Features</h2>
 <ul>
-    <li>User registration and authentication.</li>
-    <li>Role-based authorization (Admin, User).</li>
-    <li>Follow/unfollow users for a personalized feed.</li>
-    <li>Notifications for user activities.</li>
-    <li>Inbox system for managing Q&A.</li>
-    <li>User can like or dislike answers.</li>
-    <li>Tag system for categorizing questions.
-     <ul>
-        <li>Each question can be assigned multiple tags for better categorization</li>
-        <li>Admin can create, edit, and delete tags.</li>
-        <li>Users can select preferred tags when editing their profile.</li>
-     </ul>
-    </li>
-    <li>Question-Answer System
+    <li><b>User Management</b>
         <ul>
-            <li>Each question belongs to a thread, allowing for multiple subquestions and answers.</li>
-            <li>Subquestions can be nested to form a tree hierarchy for better discussion flow.</li>
+            <li>User registration and authentication</li>
+            <li>Role-based authorization (Admin, User)</li>
         </ul>
     </li>
-    <li>Filtering and Infinite Scroll
+    <li><b>User Engagement</b>
         <ul>
-            <li>Easily filter questions based on tags, date, or other criteria.</li>
-            <li>Enjoy a seamless browsing experience with infinite scroll to load more content dynamically.</li>
+            <li>Follow/unfollow users for a personalized feed</li>
+            <li>Notifications for user activities</li>
+            <li>Inbox system for managing Q&A</li>
+            <li>Like or dislike answers</li>
+        </ul>
+    </li>
+    <li><b>Tag System</b>
+        <ul>
+            <li>Assign multiple tags to each question for better categorization</li>
+            <li>Admin can create, edit, and delete tags</li>
+            <li>Users can select preferred tags when editing their profile</li>
+        </ul>
+    </li>
+    <li><b>Q&A Threading</b>
+        <ul>
+            <li>Each question belongs to a dedicated thread containing all its subquestions and answers</li>
+            <li>Subquestions can be nested in a tree hierarchy for better discussion flow</li>
+        </ul>
+    </li>
+    <li><b>Browsing Experience</b>
+        <ul>
+            <li>Filter questions by tags, date or search keyword </li>
+            <li>Infinite scroll for seamless content loading</li>
         </ul>
     </li>
 </ul>
