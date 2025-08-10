@@ -1,0 +1,13 @@
+.git
+.gitignore
+**/bin
+**/obj
+**/.vs
+**/Log
+*.png
+README.md
+dockerfile
+.dockerignore
+Es2al.Tests
+efbundle
+efbundle.exe

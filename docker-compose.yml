@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  web-app:
+    build: .
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=db,1433;User Id=sa;Password=Dev@0123456789;DataBase=Es2al;TrustServerCertificate=True"
+      BaseUrl: "http://localhost:9531"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    ports:
+      - target: 8080
+        published: 9531
+    networks:
+      - app-network
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Dev@0123456789"
+    ports:
+      - target: 1433
+        published: 1433
+    networks:
+      - app-network
+    volumes:
+      - type: volume
+        source: es2al-db
+        target: /var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "Dev@0123456789" -Q "SELECT 1" -No
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  es2al-db:

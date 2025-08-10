@@ -17,22 +17,22 @@ namespace Es2al
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Configuration.AddEnvironmentVariables();
             builder.Services.AddControllersWithViews(options =>
             {
                 options.Filters.Add(new CustomeErrorHandlerAttribute());
             });
             builder.Services.AddDbContext<AppDbContext>(e => {
                 e.ConfigureWarnings(w => w.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS));
-                e.UseSqlServer(builder.Configuration.GetConnectionString("constr"),
+                e.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
                 options => {
                     options.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
 
                 });
 
             });
-        
-            
+
+
             builder.Services.AddIdentity<AppUser, IdentityRole<int>>(options =>
             {
                 options.User.RequireUniqueEmail = true;
@@ -45,7 +45,7 @@ namespace Es2al
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
-            builder.Services.AddScoped<IUserFollowRepository,UserFollowRepository>();
+            builder.Services.AddScoped<IUserFollowRepository, UserFollowRepository>();
             builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
             builder.Services.AddScoped<IQuestionTagRepository, QuestionTagRepository>();
             builder.Services.AddScoped<ITagService, TagService>();
@@ -62,12 +62,12 @@ namespace Es2al
             {
                 options.LoginPath = "/login";  //set the login page.  
             });
-           
+
             var app = builder.Build();
-     
+
             using (var scope = app.Services.CreateScope())
             {
-                await CreateRolesAsync(scope.ServiceProvider);
+                await InitializerAsync(scope.ServiceProvider);
             }
 
             // Configure the HTTP request pipeline.
@@ -90,22 +90,24 @@ namespace Es2al
 
             app.Run();
         }
-        private static async Task CreateRolesAsync(IServiceProvider serviceProvider)
+        private static async Task InitializerAsync(IServiceProvider serviceProvider)
         {
-       
+
             var userManager = serviceProvider.GetRequiredService<ApplicationUserService>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+            var tagsRepository = serviceProvider.GetRequiredService<IBaseRepository<Tag>>();
+
             string[] roles = { "Admin", "User" };
             foreach (var role in roles)
             {
                 var roleExist = await roleManager.RoleExistsAsync(role);
                 if (!roleExist)
                 {
-                   await roleManager.CreateAsync(new IdentityRole<int>(role));
+                    await roleManager.CreateAsync(new IdentityRole<int>(role));
                 }
             }
             var user = await userManager.FindByEmailAsync("admin@admin.com");
-            if(user == null)
+            if (user == null)
             {
                 var admin = new AppUser() { UserName = "Admin", Email = "admin@admin.com" };
                 string adminPassword = "Admin0";
@@ -115,6 +117,9 @@ namespace Es2al
                     await userManager.AddToRoleAsync(admin, "Admin");
                 }
             }
+            var tag = await tagsRepository.GetAll().FirstOrDefaultAsync(e => e.Name == "Public");
+            if (tag == null)
+                await tagsRepository.AddAsync(new Tag() { Name = "Public" });
         }
     }
 }
