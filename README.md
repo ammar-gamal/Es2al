@@ -68,9 +68,11 @@
 <h3>Steps to Run</h3>
 <ol>
     <li><b>Clone the repository</b>
-        <pre><code>git clone https://github.com/ammar-gamal/Es2al.git
-cd Es2al</code></pre>
+        <pre><code>git clone https://github.com/ammar-gamal/Es2al.git</code></pre>
     </li>
+      <li><b>Navigate to the project directory
+          <pre><code>cd Es2al</code></pre>
+      </b></li>
     <li><b>Build and start the containers</b>
         <pre><code>docker-compose up --build</code></pre>
     </li>
