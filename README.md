@@ -1,16 +1,15 @@
 <h1>Es2al Project</h1>
 <h2>About the Project</h2>
-<p>Es2al is a platform where users can ask and answer questions in a dynamic and interactive environment. It features a thread-based structure that supports hierarchical question and answer discussions.</p>
+<p>Es2al is a dynamic Q&A platform where users can ask and answer questions in a structured, interactive environment.
+It uses a thread-based design where each new question automatically creates its own thread, and all related subquestions are kept within that same thread. This ensures discussions remain organized and supports hierarchical subquestions and answers.
+It also includes advanced filtering, an infinite scroll browsing experience, a tag management system with admin control, and user engagement features..</p>
 <h2>Technologies Used</h2>
 <ul>
-    <li>Backend: C#, ASP.NET MVC Framework, Entity Framework Core</li>
-    <li>Frontend: HTML, CSS, Bootstrap, and JavaScript</li>
-    <li>Database: SQL Server</li>
+    <li><b>Backend:</b> C#, ASP.NET MVC Framework, Entity Framework Core</li>
+    <li><b>Frontend:</b> HTML, CSS, Bootstrap, JavaScript</li>
+    <li><b>Database:</b> SQL Server</li>
+    <li><b>Testing:</b> xUnit, Moq, FluentAssertions</li>
 </ul>
-<h2>Testing</h2>
-<p>
-    The project includes unit tests to ensure core logic correctness and support future maintainability. Tests are written using <code>xUnit</code>, <code>Moq</code>, and <code>FluentAssertions</code>.
-</p>
 <h2>Features</h2>
 <ul>
     <li>User registration and authentication.</li>
