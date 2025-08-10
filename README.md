@@ -86,7 +86,7 @@
 <h3>Demo Account</h3>
 <p>Use the following credentials to log in as an admin:</p>
 <ul>
-    <li><b>Username:</b> admin@admin.com</li>
+    <li><b>Email:</b> admin@admin.com</li>
     <li><b>Password:</b> Admin0</li>
 </ul>
 <h2>ERD & Schema</h2>
