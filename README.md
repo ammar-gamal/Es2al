@@ -68,7 +68,7 @@
 <h3>Steps to Run</h3>
 <ol>
     <li><b>Clone the repository</b>
-        <pre><code>https://github.com/ammar-gamal/Es2al.git
+        <pre><code>git clone https://github.com/ammar-gamal/Es2al.git
 cd Es2al</code></pre>
     </li>
     <li><b>Build and start the containers</b>
