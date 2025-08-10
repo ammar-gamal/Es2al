@@ -1,16 +1,32 @@
 ﻿@model IEnumerable<Tag>
 
 @{
-    ViewData["Title"] = "index";
+    ViewData["Title"] = "Tags";
 }
 
-<button onclick="$('#form-container').slideToggle()" class="btn btn-primary"> Create Tag</button>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Tags</h2>
+        <button id="toggle-form-btn" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Create Tag
+        </button>
+    </div>
 
-<div id="form-container" style="display:none">
-    <partial name="_TagForm" model="new Tag()" />
+    <div id="form-container" class="card shadow-sm mb-4" style="display:none;">
+        <div class="card-body">
+            <partial name="_TagForm" model="new Tag()" />
+        </div>
+    </div>
+
+    <div id="tags" class="table-responsive">
+    </div>
 </div>
-<div id="tags">
-</div>
+
 @section scripts {
     <script src="~/js/tags.js"></script>
+    <script>
+        $("#toggle-form-btn").on("click", function () {
+            $("#form-container").slideToggle();
+        });
+    </script>
 }

@@ -1,18 +1,25 @@
 ﻿@model Tag
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form id="tag-form" asp-route="update-tag" asp-route-id="@Model.Id">
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span id="name-validation" asp-validation-for="Name" class="text-danger"></span>
-            </div>
-           
-            <div class="form-group">
-                <input type="submit" value="Update" class="btn btn-primary" />
-            </div>
-            <input hidden asp-for="Id" />
-        </form>
+
+<div class="container mt-4">
+    <h3 class="mb-3">Update Tag</h3>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form id="tag-form" asp-route="update-tag" asp-route-id="@Model.Id">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span id="name-validation" asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <input hidden asp-for="Id" />
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Update
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
