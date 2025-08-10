@@ -3,16 +3,16 @@ version: "3.9"
 services:
   web-app:
     build: .
-    environment:
-      ConnectionStrings__DefaultConnection: "Server=db,1433;User Id=sa;Password=Dev@0123456789;DataBase=Es2al;TrustServerCertificate=True"
-      BaseUrl: "http://localhost:9531"
     depends_on:
       db:
         condition: service_healthy
         restart: true
     ports:
       - target: 8080
-        published: 9531
+        published: 5000
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=db,1433;User Id=sa;Password=Dev@0123456789;DataBase=Es2al;TrustServerCertificate=True" #change the password according to the sql password
+      BaseUrl: "http://localhost:5000" #change the port according to the publsihed port
     networks:
       - app-network
 
