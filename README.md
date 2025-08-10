@@ -3,7 +3,7 @@
 <h2>About the Project</h2>
 <p>
     Es2al is a dynamic Q&A platform where users can ask and answer questions in a structured, interactive environment.
-    It uses a thread-based design where each new question automatically creates its own thread, and all related subquestions are kept within that same thread. This ensures discussions remain organized and supports hierarchical subquestions and answers.
+    It uses a thread-based design where each new question automatically creates its own thread, keeping all related subquestions and answers organized in a clear hierarchy.
     It also includes advanced filtering, an infinite scroll browsing experience, a tag management system with admin control, and user engagement features.
 </p>
 
