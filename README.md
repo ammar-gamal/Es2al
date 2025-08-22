@@ -29,7 +29,7 @@
     <li><b>User Engagement</b>
         <ul>
             <li>Follow/unfollow users for a personalized feed</li>
-            <li>Notifications for user activities</li>
+            <li>Real-time Notifications for user activities</li>
             <li>Inbox system for managing Q&A</li>
             <li>Like or dislike answers</li>
         </ul>
