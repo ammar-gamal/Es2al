@@ -12,7 +12,7 @@
 </p>
 <h2>Technologies Used</h2>
 <ul>
-    <li><b>Backend:</b> C#, ASP.NET MVC Framework, Entity Framework Core</li>
+    <li><b>Backend:</b> C#, ASP.NET MVC Framework, SignalR, Entity Framework Core</li>
     <li><b>Frontend:</b> HTML, CSS, Bootstrap, JavaScript</li>
     <li><b>Database:</b> SQL Server</li>
     <li><b>Testing:</b> xUnit, Moq, FluentAssertions</li>
