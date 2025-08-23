@@ -1,13 +1,14 @@
-﻿using Es2al.Services.ViewModels;
-using Es2al.Services;
+﻿using Es2al.Services;
+using Es2al.Services.ExtensionMethods;
 using Es2al.Services.IServices;
+using Es2al.Services.Paging;
+using Es2al.Services.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Es2al.Services.Paging;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 
 namespace Es2al.Controllers
 {
@@ -58,7 +59,7 @@ namespace Es2al.Controllers
             if (user is not null)
             {
                 ModelState.Clear();
-                ViewData["IsFollowing"] = await _followingService.IsFollowingAsync(GetCurrentUserId(), id);
+                ViewData["IsFollowing"] = await _followingService.IsFollowingAsync(User.GetUserIdAsInt(), id);
                 ViewData["AllTags"] = await _tagService.GetAllTagsAsync();
                 return View("show", user);
             }
@@ -69,7 +70,7 @@ namespace Es2al.Controllers
         [HttpGet("profile/edit", Name = "profile/edit")]
         public async Task<IActionResult> Edit()
         {
-            EditUserVM? user = await _applicationUserService.GetEditUserVMAsync(GetCurrentUserId());
+            EditUserVM? user = await _applicationUserService.GetEditUserVMAsync(User.GetUserIdAsInt());
             ViewBag.AllTags = await _tagService.GetAllTagsAsync();
             return View("edit", user);
         }
@@ -87,7 +88,7 @@ namespace Es2al.Controllers
                         userVM.Image = stream.ToArray();
                     }
                 }
-                int currentUserId = GetCurrentUserId();
+                int currentUserId = User.GetUserIdAsInt(); 
                 IdentityResult? result = await _applicationUserService.UpdateUserAsync(currentUserId, userVM);
                 if (result is null)
                     return RedirectToAction("logout", "account");
@@ -108,7 +109,7 @@ namespace Es2al.Controllers
         }
         private async Task<PaginatedList<QuestionAnswerVM>> GetQAsAsync(int pageIndex, int userId, QuestionFilterVM questionFilterVM)
         {
-            int visiterId = GetCurrentUserId();
+            int visiterId = User.GetUserIdAsInt();
             var QAs = await _questionService.GetUserQA(visiterId,userId, pageIndex, questionFilterVM);
             return QAs;
         }

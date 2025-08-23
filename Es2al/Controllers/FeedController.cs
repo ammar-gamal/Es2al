@@ -4,6 +4,7 @@ using Es2al.Services.Paging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Es2al.Services.ExtensionMethods;
 
 namespace Es2al.Controllers
 {
@@ -34,7 +35,9 @@ namespace Es2al.Controllers
         }
         private async Task<PaginatedList<QuestionAnswerVM>> GetQAsAsync(int pageIndex, QuestionFilterVM questionFilterVM)
         {
-            var userId = GetCurrentUserId();
+
+            //var userId = GetCurrentUserId();
+            var userId = User.GetUserIdAsInt();
             var QAs = await _questionService.GetFeedQAsAsync(userId, pageIndex,questionFilterVM);
             return QAs;
         }

@@ -1,7 +1,8 @@
 ﻿using Es2al.Filters;
-using Es2al.Services.ViewModels;
+using Es2al.Services.ExtensionMethods;
 using Es2al.Services.IServices;
 using Es2al.Services.Paging;
+using Es2al.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -35,7 +36,8 @@ namespace Es2al.Controllers
         }
         private async Task<PaginatedList<QuestionVM>> GetQuestionsAsync(QuestionFilterVM questionFilterVM, int pageIndex)
         {
-            var userId = GetCurrentUserId();
+            //var userId = GetCurrentUserId();
+            var userId = User.GetUserIdAsInt(); 
             var questions = await _questionService.GetUserInboxAsync(userId, pageIndex, questionFilterVM);
             return questions;
         }

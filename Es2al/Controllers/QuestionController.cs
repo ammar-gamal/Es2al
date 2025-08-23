@@ -1,11 +1,12 @@
 ﻿using Es2al.Filters;
 using Es2al.Models.Entites;
-using Es2al.Services.ViewModels;
+using Es2al.Services;
+using Es2al.Services.ExtensionMethods;
 using Es2al.Services.IServices;
+using Es2al.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Es2al.Services;
 
 namespace Es2al.Controllers
 {
@@ -34,7 +35,7 @@ namespace Es2al.Controllers
             if (ModelState.IsValid)
             {
                 ModelState.Clear(); //When posting data and then re-displaying data in the same request, the ModelState will be populated with the data from the original post.
-                int senderId = GetCurrentUserId();
+                int senderId = User.GetUserIdAsInt();
                 Question question = new();
                 var selectedTags = questionVM.Tags.Select(tagId => new QuestionTag() { TagId = tagId }).ToList();
                 question.Text = questionVM.Text;
@@ -57,7 +58,7 @@ namespace Es2al.Controllers
             if (ModelState.IsValid)
             {
                 ModelState.Clear();
-                int senderId = GetCurrentUserId();
+                int senderId = User.GetUserIdAsInt();
                 Question question = new()
                 {
                     SenderId = senderId,
@@ -82,19 +83,19 @@ namespace Es2al.Controllers
         [HttpGet("questions/find/{id}")]
         public async Task<IActionResult> GetQuestion(int id)
         {
-            var QA =await _questionService.GetQuestionAnswerAsync(id, GetCurrentUserId());
+            var QA =await _questionService.GetQuestionAnswerAsync(id, User.GetUserIdAsInt());
             return View("QuestionAnswer", QA);
         }
         [HttpGet("questions/delete/{id}")]
         public async Task<IActionResult> DeleteQuestion(int id)
         {
-            await _questionService.DeleteQuestionAsync(id,GetCurrentUserId());
+            await _questionService.DeleteQuestionAsync(id, User.GetUserIdAsInt());
             return Ok();
         }
         [HttpGet("questions/thread/{threadId:int:min(1)}/{questionId:int:min(1)}")]
         public async Task<IActionResult> QuestionsThread(int threadId,int questionId)
         {
-            var res = await _questionService.GetQuestionsInThreadAsync(threadId, GetCurrentUserId());
+            var res = await _questionService.GetQuestionsInThreadAsync(threadId, User.GetUserIdAsInt());
 
             if (res == null)
                 return RedirectToAction("index", "feed");

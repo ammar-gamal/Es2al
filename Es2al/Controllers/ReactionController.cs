@@ -1,4 +1,5 @@
 ﻿using Es2al.Models.Enums;
+using Es2al.Services.ExtensionMethods;
 using Es2al.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ namespace Es2al.Controllers
         [HttpPost("react", Name = "react")]
         public async Task<IActionResult> React(int answerId, string react)
         {
-            var res = await _reactionService.ReactAsync(GetCurrentUserId(), answerId,react);
+            var res = await _reactionService.ReactAsync(User.GetUserIdAsInt(), answerId,react);
             return Ok(res);
         }
         private int GetCurrentUserId() => Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

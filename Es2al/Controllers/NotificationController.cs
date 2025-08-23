@@ -1,4 +1,5 @@
-﻿using Es2al.Services.IServices;
+﻿using Es2al.Services.ExtensionMethods;
+using Es2al.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -17,20 +18,19 @@ namespace Es2al.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Index()
         {
-            var notifications = await _notificationService.GetUserNotificationsAsync(GetCurrentUserId());
+            var notifications = await _notificationService.GetUserNotificationsAsync(User.GetUserIdAsInt());
             return View(notifications);
         }
         [HttpGet("notifications/delete-all-readed", Name = "delete-all-readed")]
         public async Task<IActionResult> DeleteReadedNotifications()
         {
-            await _notificationService.DeleteUserReadedNotifications(GetCurrentUserId());
+            await _notificationService.DeleteUserReadedNotificationsAsync(User.GetUserIdAsInt());
             return RedirectToAction("index");
         }
         [HttpPost("notifications/mark-read/{id}", Name = "mark-notification")]
         public async Task<IActionResult> MarkNotificationAsRead(int id)
         {
-            await _notificationService.MarkNotificationAsRead(id, GetCurrentUserId());
-            var notifications = await _notificationService.GetUserNotificationsAsync(GetCurrentUserId());
+            await _notificationService.MarkNotificationAsReadAsync(id, User.GetUserIdAsInt());
             return Ok();
         }
         private int GetCurrentUserId() => Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
