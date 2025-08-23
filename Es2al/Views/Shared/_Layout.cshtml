@@ -1,5 +1,4 @@
-﻿@inject INotificationService _notificationService;
-@{
+﻿@{
 
 }
 <!DOCTYPE html>
@@ -52,18 +51,9 @@
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item position-relative">
-                                <a class="nav-link" asp-route="notifications">
-                                    <i class="fas fa-bell"></i>
-                                    Notifications
-                                    @{
-                                        int unreadNotificationsCount = await _notificationService.NumberOfUnReadedNotificationsAsync(Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!));
-                                        if (unreadNotificationsCount > 0)
-                                        {
-                                            <span id="notifications-count" data-count="@unreadNotificationsCount" class="badge rounded-pill bg-danger position-absolute top-0 start-0 translate-middle">
-                                                @unreadNotificationsCount
-                                            </span>
-                                        }
-                                    }
+                                <a id="notification-link" class="nav-link" asp-route="notifications">
+                                    <i class="fas fa-bell"></i> Notifications
+
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -124,7 +114,16 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    @if (User.Identity?.IsAuthenticated ?? false)
+    {
+        <script src="~/js/notification-badge.js"></script>
+    }
+    
+
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

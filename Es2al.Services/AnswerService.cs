@@ -12,11 +12,13 @@ namespace Es2al.Services
     {
         private readonly IAnswerRepository _answerRepository;
         private readonly IQuestionService _questionService;
-        public event EventHandlerAsync<QuestionAnswerEventArgs> OnQuestionAnswer;
-        public AnswerService(IAnswerRepository answerRepository, IQuestionService questionService)
+        //public event EventHandlerAsync<QuestionAnswerEventArgs> OnQuestionAnswer;
+        private readonly INotificationService _notificationService;
+        public AnswerService(IAnswerRepository answerRepository, IQuestionService questionService,INotificationService notificationService)
         {
             _answerRepository = answerRepository;
             _questionService = questionService;
+            _notificationService = notificationService;
         }
 
 
@@ -27,31 +29,30 @@ namespace Es2al.Services
 
         public async Task SaveAnswerAsync(Answer answer)
         {
-            using (var transaction = await _answerRepository.BeginTransactionAsync())
+            using var transaction = await _answerRepository.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    var question = await _questionService.GetQuestionAsync(answer.QuestionId, answer.UserId);
+                var question = await _questionService.GetQuestionAsync(answer.QuestionId, answer.UserId);
 
-                    if (!question.IsAnswered)
-                        question.IsAnswered = true;
+                if (!question.IsAnswered)
+                    question.IsAnswered = true;
 
-                    question.Answer = answer;
-                    await _questionService.UpdateQuestionAsync(question);
-                    if (OnQuestionAnswer != null)
-                    {
-                        await OnQuestionAnswer.Invoke(this, new QuestionAnswerEventArgs 
-                                                        { UserId=question.SenderId,
-                                                          QuestionId=question.Id,
-                                                          ReceiverId=question.ReceiverId});
-                    }
-                    await transaction.CommitAsync();
-                }
-                catch (Exception exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw new AppException(exception.Message);
-                }
+                question.Answer = answer;
+                await _questionService.UpdateQuestionAsync(question);
+                //if (OnQuestionAnswer != null)
+                //{
+                //    await OnQuestionAnswer.Invoke(this, new QuestionAnswerEventArgs 
+                //                                    { UserId=question.SenderId,
+                //                                      QuestionId=question.Id,
+                //                                      ReceiverId=question.ReceiverId});
+                //}
+                await _notificationService.AnswerNotificationAsync(question.ReceiverId, question.SenderId, question.Id);
+                await transaction.CommitAsync();
+            }
+            catch (Exception exception)
+            {
+                await transaction.RollbackAsync();
+                throw new AppException(exception.Message);
             }
         }
     }

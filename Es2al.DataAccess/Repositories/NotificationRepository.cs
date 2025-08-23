@@ -22,9 +22,9 @@ namespace Es2al.DataAccess.Repositories
                  .ExecuteDeleteAsync();
         }
 
-        public async Task<Notification> GetNotification(int notificationId, int userId)
+        public async Task<Notification?> GetNotificationAsync(int notificationId, int userId)
         {
-            return await _dbSet.FirstAsync(e => e.Id == notificationId && e.UserId == userId);
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == notificationId && e.UserId == userId);
         }
     }
 }

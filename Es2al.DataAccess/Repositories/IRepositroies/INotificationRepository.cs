@@ -6,6 +6,6 @@ namespace Es2al.DataAccess.Repositories.IRepositroies
     {
         IQueryable<Notification> GetUserNotifications(int userId);
         Task DeleteUserReadedNotificationsAsync(int userId);
-        Task<Notification> GetNotification(int notificationId, int userId);
+        Task<Notification?> GetNotificationAsync(int notificationId, int userId);
     }
 }

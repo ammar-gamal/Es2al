@@ -3,6 +3,8 @@ using Es2al.DataAccess.Context;
 using Es2al.DataAccess.Repositories;
 using Es2al.DataAccess.Repositories.IRepositroies;
 using Es2al.Filters;
+using Es2al.Hubs;
+using Es2al.Hubs.Services;
 using Es2al.Models.Entites;
 using Es2al.Services;
 using Es2al.Services.IServices;
@@ -22,6 +24,7 @@ namespace Es2al
             {
                 options.Filters.Add(new CustomeErrorHandlerAttribute());
             });
+            builder.Services.AddSignalR();
             builder.Services.AddDbContext<AppDbContext>(e => {
                 e.ConfigureWarnings(w => w.Ignore(SqlServerEventId.SavepointsDisabledBecauseOfMARS));
                 e.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -57,12 +60,12 @@ namespace Es2al
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<IQuestionTagService, QuestionTagService>();
-
+            builder.Services.AddScoped<INotificationHubService, NotificationHubService>();
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = "/login";  //set the login page.  
             });
-
+            
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
@@ -77,13 +80,11 @@ namespace Es2al
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            // app.UseHttpsRedirection();
+            app.MapHub<NotificationHub>("/notification");
             app.UseStaticFiles();
-
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Feed}/{action=Index}");

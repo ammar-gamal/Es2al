@@ -6,7 +6,7 @@ namespace Es2al.Services.IServices
 {
     public interface IAnswerService
     {
-        public event EventHandlerAsync<QuestionAnswerEventArgs> OnQuestionAnswer;
+        //public event EventHandlerAsync<QuestionAnswerEventArgs> OnQuestionAnswer;
         public Task SaveAnswerAsync(Answer answer);
         public Task<bool> IsAnswerExistAsync(int answerId);
     }

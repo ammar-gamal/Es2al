@@ -1,62 +1,127 @@
-﻿@model Dictionary<bool,List<Notification>>
-@if (Model.Count == 0)
-{
-    <div class="container mt-4 text-center">
-        <h5 class="text-muted">You have no notifications at the moment.</h5>
-        <p class="text-secondary">Check back later to see if there’s anything new.</p>
-    </div>
-}
-else
-{
-    <div class="container mt-4 notification-wrapper">
-        @foreach (var keyValue in Model)
+﻿@model Dictionary<bool, List<Notification>>
+
+<div class="notifications-page">
+    <div class="container mt-4">
+        @if (!Model.Any() || !Model.Values.Any(list => list.Any()))
         {
-            <div class="mb-5 ">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="text-@((keyValue.Key ? "success" : "primary"))">
-                        @(keyValue.Key ? "Readed Notifications" : "Unreaded Notifications")
-                    </h5>
-                    @if (keyValue.Key)
-                    {
-                        <a asp-route="delete-all-readed"
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('Are you sure you want to delete all read notifications?');">
-                            Delete All
-                        </a>
-                    }
+            <!-- Empty State -->
+            <div class="empty-state text-center py-5">
+                <div class="empty-icon mb-3">
+                    <i class="fas fa-bell-slash fa-3x text-muted"></i>
                 </div>
-                <div id="notifications-container">
-                    <ul id="@(keyValue.Key ? "readed-notifications" : "unreaded-notifications")"
-                        class="list-group shadow-sm">
-                        @foreach (var notification in keyValue.Value)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-start"
-                                id="@notification.Id">
-                                <div>
-                                    <small class="text-muted timestamp me-2">
-                                        @notification.GetDate()
-                                    </small>
-                                    <p class="mb-1">@notification.Text</p>
-                                    @if (notification.RelatedUrl != null)
+                <h4 class="text-muted mb-2">No notifications yet</h4>
+                <p class="text-secondary">You're all caught up! Check back later for new updates.</p>
+            </div>
+        }
+        else
+        {
+            <!-- Notifications Container -->
+            <div class="notifications-container" id="notifications-container">
+                @foreach (var section in Model.Where(kv => kv.Value.Any()))
+                {
+                    bool isRead = section.Key;
+                    var notifications = section.Value;
+
+                    <div class="notification-section mb-4" data-section="@(isRead ? "read" : "unread")">
+                        <div class="section-header d-flex justify-content-between align-items-center mb-3 p-3 rounded-top bg-light border">
+                            <div class="section-title">
+                                <h5 class="mb-0 text-@(isRead ? "success" : "primary")">
+                                    <i class="fas fa-@(isRead ? "check-circle" : "exclamation-circle") me-2"></i>
+                                    @(isRead ? "Read Notifications" : "Unread Notifications")
+                                    <span class="badge bg-@(isRead ? "success" : "primary") ms-2">@notifications.Count</span>
+                                </h5>
+                            </div>
+
+                            @if (isRead && notifications.Any())
+                            {
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm delete-all-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteAllModal">
+                                    <i class="fas fa-trash me-1"></i>
+                                    Clear All
+                                </button>
+                            }
+                        </div>
+
+                        <div class="notifications-list" id="@(isRead ? "read-notifications" : "unread-notifications")">
+                            @foreach (var notification in notifications)
+                            {
+                                <div class="notification-item border rounded mb-2 p-3 bg-white shadow-sm"
+                                     id="notification-@notification.Id"
+                                     data-notification-id="@notification.Id"
+                                     data-date="@notification.Date.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")">
+
+
+                                    <div class="notification-content">
+                                        <div class="notification-meta mb-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                @notification.GetDate()
+                                            </small>
+                                        </div>
+
+                                        <div class="notification-text mb-2">
+                                            <p class="mb-0">@notification.Text</p>
+                                        </div>
+
+                                        @if (!string.IsNullOrEmpty(notification.RelatedUrl))
+                                        {
+                                            <div class="notification-link">
+                                                <a href="@notification.RelatedUrl"
+                                                   class="btn btn-link btn-sm p-0 text-decoration-none">
+                                                    <i class="fas fa-external-link-alt me-1"></i>
+                                                    @(notification.AnchorText ?? "View Details")
+                                                </a>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    @if (!isRead)
                                     {
-                                        <a href="@notification.RelatedUrl" class="text-info">
-                                            @notification.AnchorText
-                                        </a>
+                                        <div class="notification-actions mt-2 d-flex justify-content-end">
+                                            <button type="button"
+                                                    class="btn btn-outline-primary btn-sm mark-read-btn"
+                                                    onclick="markAsRead(@notification.Id)">
+                                                <i class="fas fa-check me-1"></i>
+                                                Mark as Read
+                                            </button>
+                                        </div>
                                     }
                                 </div>
-                                @if (!keyValue.Key)
-                                {
-                                    <button class="btn btn-outline-primary btn-sm" onclick="markAsRead(@notification.Id)">Mark as Read</button>
-                                }
-                            </li>
-                        }
-                    </ul>
-                </div>
+                            }
+                        </div>
+                    </div>
+                }
             </div>
         }
     </div>
-}
+</div>
 
+<!-- Delete All Confirmation Modal -->
+<div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAllModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete all read notifications? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a asp-route="delete-all-readed" class="btn btn-danger">
+                    <i class="fas fa-trash me-1"></i>
+                    Delete All
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
-    <script src="~/js/notification.js"></script>
+    <script src="~/js/notification-actions.js"></script>
 }

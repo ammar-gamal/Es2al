@@ -5,13 +5,14 @@ using System.Net;
 using System.Security.Claims;
 using Es2al.Models.Entites;
 using Microsoft.AspNetCore.Authorization;
+using Es2al.Services.ExtensionMethods;
 namespace Es2al.Controllers
 {
     [Authorize]
     public class AnswerController : Controller
     {
         private readonly IAnswerService _answerService;
-        public AnswerController(IAnswerService answerService,INotificationService notificationService)
+        public AnswerController(IAnswerService answerService)
         {
             _answerService = answerService;
         }
@@ -27,7 +28,7 @@ namespace Es2al.Controllers
 
             if (ModelState.IsValid)
             {
-                int userId = GetCurrentUserId();
+                int userId = User.GetUserIdAsInt();
                 Answer answer = GetAnswer(answerVM, userId, answerVM.QuestionId);
                 await _answerService.SaveAnswerAsync(answer);
                 return Ok();
@@ -35,15 +36,16 @@ namespace Es2al.Controllers
             HttpContext.Response.StatusCode = (int)HttpStatusCode.PartialContent;
             ViewData["questionId"] = answerVM.QuestionId;
             return PartialView("_AnswerForm", answerVM);
+
         }
         private int GetCurrentUserId() => Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        private Answer GetAnswer(NewAnswerVM answerVM,int userId,int questionId) => new Answer
+        private Answer GetAnswer(NewAnswerVM answerVM, int userId, int questionId) => new Answer
         {
             Date = DateTime.Now,
             Text = answerVM.Text,
-            UserId=userId,
-            QuestionId=questionId
-            
+            UserId = userId,
+            QuestionId = questionId
+
         };
 
     }

@@ -12,8 +12,8 @@ namespace Es2al.Services.IServices
         Task<bool> IsFollowingAsync(int followerId, int followingId);
         Task<PaginatedList<DisplayUserVM>> GetUserFollowingsAsync(int userId, int pageIndex);
         Task<PaginatedList<DisplayUserVM>> GetUserFollowersAsync(int userId, int pageIndex);
-        public event EventHandlerAsync<FollowingEventArgs> OnUserFollow;
-        public event EventHandlerAsync<FollowingEventArgs> OnUserUnFollow;
+        //public event EventHandlerAsync<FollowingEventArgs> OnUserFollow;
+        //public event EventHandlerAsync<FollowingEventArgs> OnUserUnFollow;
 
     }
 }

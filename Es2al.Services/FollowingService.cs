@@ -16,13 +16,15 @@ namespace Es2al.Services
     {
         private readonly IUserFollowRepository _userFollowRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public event EventHandlerAsync<FollowingEventArgs> OnUserFollow;
-        public event EventHandlerAsync<FollowingEventArgs> OnUserUnFollow;
+        //public event EventHandlerAsync<FollowingEventArgs> OnUserFollow;
+        //public event EventHandlerAsync<FollowingEventArgs> OnUserUnFollow;
+        private readonly INotificationService _notificationService;
 
-        public FollowingService(IUserFollowRepository userFollowRepository, IHttpContextAccessor httpContextAccessor)
+        public FollowingService(IUserFollowRepository userFollowRepository, IHttpContextAccessor httpContextAccessor, INotificationService notificationService)
         {
             _userFollowRepository = userFollowRepository;
             _httpContextAccessor = httpContextAccessor;
+            _notificationService = notificationService;
         }
 
         public async Task FollowAsync(int followerId, int followingId)
@@ -37,8 +39,9 @@ namespace Es2al.Services
                 try
                 {
                     await _userFollowRepository.AddAsync(new UserFollow() { FollowerId = followerId, FollowingId = followingId });
-                    if (OnUserFollow != null)
-                        await OnUserFollow.Invoke(this, new FollowingEventArgs { UserId=followingId});
+                    //if (OnUserFollow != null)
+                    //    await OnUserFollow.Invoke(this, new FollowingEventArgs { UserId=followingId});
+                    await _notificationService.FollowNotificationAsync(followingId);
 
                     await transaction.CommitAsync();
 
@@ -65,11 +68,12 @@ namespace Es2al.Services
                 try
                 {
                     await _userFollowRepository.RemoveAsync(new UserFollow() { FollowerId = followerId, FollowingId = followingId });
-                    if (OnUserUnFollow != null)
-                    {
-                        string followerName = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name)!;
-                        await OnUserUnFollow.Invoke(this, new FollowingEventArgs { UserId=followingId});
-                    }
+                    //if (OnUserUnFollow != null)
+                    //{
+                    //    string followerName = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name)!;
+                    //    await OnUserUnFollow.Invoke(this, new FollowingEventArgs { UserId=followingId});
+                    //}
+                    await _notificationService.UnFollowNotificationAsync(followingId);
 
                     await transaction.CommitAsync();
                 }
