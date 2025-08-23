@@ -16,12 +16,14 @@ namespace Es2al.Tests.Services
         private readonly IAnswerService _sut;
         private readonly Mock<IAnswerRepository> _answerRepository;
         private readonly Mock<IQuestionService> _questionService;
+        private readonly Mock<INotificationService> _notificationService;
 
         public AnswerServiceTests()
         {
             _answerRepository = new();
             _questionService = new();
-            _sut = new AnswerService(_answerRepository.Object, _questionService.Object);
+            _notificationService = new();
+            _sut = new AnswerService(_answerRepository.Object, _questionService.Object,_notificationService.Object);
         }
         [Fact]
         public async Task SaveAnswerAsync_SavingAnswer_TransactionShouldBeginAndCommitAndUpdateQuestionCalled()
@@ -101,7 +103,7 @@ namespace Es2al.Tests.Services
         }
 
         [Fact]
-        public async Task SaveAnswerAsync_OnQuestionAnswerEventIsNotNull_EnsureTheEventIsCalled()
+        public async Task SaveAnswerAsync_WhenQuestionIsAnswered_EnsureThatNotificationIsSended()
         {
             //Arrange
             int questionId = 1, senderId = 1, receiverId = 2;
@@ -113,25 +115,14 @@ namespace Es2al.Tests.Services
             _answerRepository.Setup(e => e.BeginTransactionAsync()).ReturnsAsync(dbTransaction);
             _questionService.Setup(e => e.UpdateQuestionAsync(It.IsAny<Question>())).Returns(Task.CompletedTask);
             _questionService.Setup(e => e.GetQuestionAsync(questionId, receiverId)).ReturnsAsync(question);
+            _notificationService.Setup(e=>e.AnswerNotificationAsync(receiverId,senderId,questionId)).Returns(Task.CompletedTask);
             mockDbTransaction.Setup(e => e.CommitAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-
-            bool isRaised = false;
-            QuestionAnswerEventArgs eventActualArgs = new();
-            _sut.OnQuestionAnswer += (sender, args) =>
-            {
-                isRaised = true;
-                eventActualArgs = args;
-                return Task.CompletedTask;
-            };
 
             //Act
             await _sut.SaveAnswerAsync(answer);
 
             //Assert
-            isRaised.Should().BeTrue();
-            eventActualArgs.QuestionId.Should().Be(questionId);
-            eventActualArgs.UserId.Should().Be(senderId);
-            eventActualArgs.ReceiverId.Should().Be(receiverId);
+            _notificationService.Verify();
         }
     }
 }
